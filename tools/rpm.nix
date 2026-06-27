@@ -5,6 +5,10 @@
   pkgs,
   nixosConfig,
   qubesVersion,
+  # Size of the template's root disk image, in mebibytes. The default of 10G is
+  # often too small once additional software is layered into the template, so
+  # downstream consumers can override this when building the RPM.
+  diskSize ? 10240,
 }: let
   version = "4.0.6";
   rootImg = import "${nixpkgs}/nixos/lib/make-disk-image.nix" {
@@ -20,7 +24,7 @@
         target = "/etc/nixos/flake.nix";
       }
     ];
-    diskSize = 10240; # 10G
+    inherit diskSize;
     partitionTableType = "hybrid";
     name = "root";
   };

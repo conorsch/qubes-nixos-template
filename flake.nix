@@ -90,11 +90,16 @@
         ];
       };
     };
-    rpm = pkgs.callPackage ./tools/rpm.nix {
-      inherit nixpkgs;
-      qubesVersion = "4.3.0";
-      nixosConfig = nixosConfigurations.nixos;
-    };
+    # Builds the template RPM. `diskSize` (in MiB) controls the size of the
+    # template's root disk image; downstream consumers can override it via
+    # `mkRpm { diskSize = 20480; }` when 10G is too small for their software.
+    mkRpm = {diskSize ? 10240}:
+      pkgs.callPackage ./tools/rpm.nix {
+        inherit nixpkgs diskSize;
+        qubesVersion = "4.3.0";
+        nixosConfig = nixosConfigurations.nixos;
+      };
+    rpm = mkRpm {};
     iso = nixosConfigurations.iso.config.system.build.isoImage;
 
     # Expose only the custom qubes packages (not all of nixpkgs) so that
